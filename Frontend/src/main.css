@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+:root {
+  --footer-height: 56px;
+  --navbar-h: 64px;
+  --footer-h: 48px;
+}
+
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f3f4f6; /* bg-gray-100 */
+  transition: background-color 300ms;
+  padding-bottom: var(--footer-height);
+}
+
+#app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tema escuro manual */
+body.dark-mode {
+  background-color: #aeb0b5;
+}
+
+body.dark-mode nav,
+body.dark-mode footer {
+  background-color: #000000;
+}
+
+body.dark-mode .btn-login {
+  background-color: #000000;
+}
+
+body.dark-mode .btn-login:hover {
+  background-color: #1f2937;
+}
+
+body.dark-mode .theme-toggle {
+  background-color: #aeb0b5;
+  color: #f9fafb;
+}
