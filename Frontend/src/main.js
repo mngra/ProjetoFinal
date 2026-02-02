@@ -1,6 +1,19 @@
 import { createApp } from "vue";
-import router from "./router";
-import "./main.css";
+import { createPinia } from "pinia";
 import App from "./App.vue";
+import router from "./router";
 
-createApp(App).use(router).mount("#app");
+import "@/main.css";
+
+const app = createApp(App);
+const pinia = createPinia();
+
+app.use(pinia);
+
+/* 🔁 hidratar auth ANTES do router */
+import { useAuthStore } from "@/stores/auth.store";
+const auth = useAuthStore(pinia);
+auth.hydrate();
+
+app.use(router);
+app.mount("#app");

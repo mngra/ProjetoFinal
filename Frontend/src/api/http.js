@@ -1,47 +1,46 @@
+// src/api/http.js
 import axios from "axios";
-import { ApiError } from "./errors";
 
-export function createHttpClient({ getToken, onUnauthorized } = {}) {
+/**
+ * Cria um cliente HTTP configurável
+ */
+export function createHttpClient({
+  baseURL = "/api",
+  getToken,
+  onUnauthorized,
+} = {}) {
   const http = axios.create({
-    baseURL: "/api",
-    timeout: 10000,
+    baseURL,
   });
 
+  // 👉 Interceptor de request (token)
   http.interceptors.request.use(
     (config) => {
+      console.log(config);
       const token = getToken?.();
-      if (token) config.headers.Authorization = `Bearer ${token}`;
+      console.log(token);
+      if (token) {
+        config.headers = config.headers ?? {};
+        config.headers.Authorization = `Bearer ${token}`; 
+      }
       return config;
     },
     (error) => Promise.reject(error)
   );
 
+  // 👉 Interceptor de response (erros globais)
   http.interceptors.response.use(
     (response) => response,
     (error) => {
-      // Timeout / network
-      if (error.code === "ECONNABORTED") {
-        return Promise.reject(new ApiError("Tempo de espera excedido", { code: error.code }));
+      const status = error?.response?.status;
+
+      if (status === 401) {
+        // sessão inválida / expirada
+        onUnauthorized?.();
       }
 
-      if (error.response) {
-        const { status, data } = error.response;
-
-        if (status === 401) {
-          onUnauthorized?.();
-        }
-
-        const message =
-          data?.message ||
-          data?.error ||
-          (Array.isArray(data?.errors) ? data.errors.join(", ") : null) ||
-          `Erro HTTP ${status}`;
-
-        return Promise.reject(new ApiError(message, { status, data, code: error.code }));
-      }
-
-      if (error.request) {
-        return Promise.reject(new ApiError("Não foi possível contactar o servidor", { code: error.code }));
+      if (status === 403) {
+        error.message = "Não tem permissões para esta ação.";
       }
 
       return Promise.reject(error);
@@ -50,3 +49,16 @@ export function createHttpClient({ getToken, onUnauthorized } = {}) {
 
   return http;
 }
+
+/**
+ * Instância global padrão (a mais usada)
+ */
+const http = createHttpClient({
+  getToken: () => localStorage.getItem("token"),
+  onUnauthorized: () => {
+    localStorage.removeItem("token");
+   // window.location.href = "/login";
+  },
+});
+
+export default http;

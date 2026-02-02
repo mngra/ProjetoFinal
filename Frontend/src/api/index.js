@@ -1,11 +1,32 @@
 import { createHttpClient } from "./http";
-import { useAuthStore } from "../stores/authStore";
+import { useAuthStore } from "@/stores/auth.store";
 
-export function makeApiClient() {
-  const auth = useAuthStore();
+let httpInstance;
+function getTokenFromStorage() {
+  try {
+    const raw = localStorage.getItem("auth");
+    if (!raw) return null;
 
-  return createHttpClient({
-    getToken: () => auth.token,          // se token for string normal
-    onUnauthorized: () => auth.clearSession(),
-  });
+    const parsed = JSON.parse(raw);
+    return parsed.token || null;
+  } catch {
+    return null;
+  }
+}
+
+export function getHttp() {
+  if (!httpInstance) {
+    httpInstance = createHttpClient({
+     /* getToken: () => {
+        const auth = useAuthStore();   // 👈 LIDO AQUI, EM TEMPO REAL
+        return auth.token;
+      },*/
+      getToken: getTokenFromStorage,
+      onUnauthorized: () => {
+        const auth = useAuthStore();
+        auth.clearSession();
+      },
+    });
+  }
+  return httpInstance;
 }

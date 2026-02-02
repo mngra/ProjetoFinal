@@ -1,25 +1,19 @@
-import { computed, ref } from "vue";
-import { authStore } from "../stores/authStore";
-import { loginRequest, logoutRequest } from "../api/authService";
-
-const loading = ref(false);
+import { computed } from "vue";
+import { useAuthStore } from "@/stores/auth.store";
 
 export function useAuth() {
-  const isAuthenticated = computed(() => authStore.isAuthenticated.value);
-  const user = computed(() => authStore.user.value);
+  const auth = useAuthStore();
 
-  async function login(payload) {
-    loading.value = true;
-    try {
-      return await loginRequest(payload);
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  function logout() {
-    logoutRequest();
-  }
-
-  return { isAuthenticated, user, loading, login, logout };
+  return {
+    user: computed(() => auth.user),
+    token: computed(() => auth.token),
+    isAuthenticated: computed(() => auth.isAuthenticated),
+    isAdmin:  auth.isAdmin,
+    roles: auth.roles,
+    canManageDocentes: auth.canManageDocentes,
+    loading: computed(() => auth.loading),
+    login: auth.login,
+    logout: auth.logout,
+    clearSession: auth.clearSession,
+  };
 }

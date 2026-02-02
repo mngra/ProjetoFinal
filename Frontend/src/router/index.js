@@ -1,48 +1,110 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { authStore } from "../stores/authStore";
+import { useAuthStore } from "@/stores/auth.store";
+import MainLayout from "@/components/layout/MainLayout.vue";
 
-import MainLayout from "../layouts/MainLayout.vue";
-import LoginView from "../views/LoginView.vue";
-import DocentesView from "../views/DocentesView.vue";
-import PropostasView from "../views/PropostasView.vue"; 
-import PropostaDetalheView from "../views/PropostaDetalheView.vue";
-import PropostaNovaView from "../views/PropostaNovaView.vue";
-import PropostaEditarView from "../views/PropostaEditarView.vue";
+const routes = [
+  {
+    path: "/",
+    redirect: "/login",
+  },
 
-const routes = [  
+  /* 🔓 PÚBLICO (sem layout) */
+  {
+    path: "/login",
+    component: () => import("@/pages/auth/LoginPage.vue"),
+    meta: { public: true },
+  },
+
+  /* 🌍 MAIN LAYOUT (público e protegido) */
   {
     path: "/",
     component: MainLayout,
     children: [
-      { path: "login", name: "login", component: LoginView, meta: { hideBreadcrumbs: true } },
-      { path: "", redirect: "/propostas" }, // após login vai para propostas
-      { path: "propostas", name: "propostas", component: PropostasView, meta: { requiresAuth: true } },
-      { path: "docentes", name: "docentes", component: DocentesView },
-      { path: "propostas/:id", name: "PropostaDetalhe", component: PropostaDetalheView, meta: { requiresAuth: true } },
-      { path: "propostas/nova", name: "PropostaNova", component: PropostaNovaView, meta: { requiresAuth: true } },
-      { path: "propostas/:id/editar", name: "PropostaEditarView", component: PropostaEditarView , meta: { requiresAuth: true } },
+      /* 🔓 Público com layout */
+      {
+        path: "docentes",
+        component: () => import("@/pages/docentes/DocentesListPage.vue"),
+        meta: { public: true },
+      },
+     {
+        path: "/docente/registar",
+        component: () => import("@/pages/docentes/DocenteCreatePage.vue"),
+        meta: { public: true },
+      },
+
+      /* 🔐 Protegido com layout */
+      {
+        path: "propostas",
+        name: "propostas",
+        component: () => import("@/pages/propostas/PropostasListPage.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "/propostas/:id/editar",
+        name: "PropostaEditarView",
+        component: () => import("@/pages/propostas/PropostaEditPage.vue"),
+        meta: { requiresAuth: true },
+      },
+      { path: "propostas/:id", 
+        name: "PropostaDetalhe", 
+        component: () => import("@/pages/propostas/PropostaDetalhePage.vue"), 
+        meta: { requiresAuth: true },
+      },
+      { path: "propostas/nova", 
+        name: "PropostaNova",
+        component: () => import("@/pages/propostas/PropostaCreatePage.vue"), 
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "/docentes/:id/editar",
+        name: "DocentesEditar",
+        component: () => import("@/pages/docentes/DocenteEditPage.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "/alunos",
+        name: "AlunosList",
+        component: () => import("@/pages/alunos/AlunosListPage.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "/alunos/criar",
+        name: "AlunosCreate",
+        component: () => import("@/pages/alunos/AlunoCreatePage.vue"),
+        meta: { requiresAuth: true, roles: ['admin'] },
+      },
+      {
+        path: "/alunos/:id/editar",
+        name: "AlunosEdit",
+        component: () => import("@/pages/alunos/AlunoEditPage.vue"),
+        meta: { requiresAuth: true, roles: ['admin'] },
+      },
+
       
     ],
   },
-
-  //{ path: "/:pathMatch(.*)*", redirect: "/propostas" },
 ];
-
 const router = createRouter({
   history: createWebHistory(),
   routes,
 });
 
+/* AUTH GUARD */
 router.beforeEach((to) => {
-  // se não está autenticado e tenta ir a página protegida
-  if (to.meta.requiresAuth && !authStore.isAuthenticated.value) {
-    return { name: "login", query: { next: to.fullPath } };
-  }
+  const auth = useAuthStore();
 
-  // se já está autenticado e vai ao login, manda para propostas
-  if (to.name === "login" && authStore.isAuthenticated.value) {
-    return { name: "propostas" };
+  const requiresAuth = to.matched.some((r) => r.meta.requiresAuth);
+  const isAuthenticated = auth.isAuthenticated;
+
+  // 🔐 Não autenticado a tentar rota protegida
+  if (requiresAuth && !isAuthenticated) {
+    return {
+      path: "/login",
+      query: { next: to.fullPath },
+    };
   }
+  return true;
 });
+
 
 export default router;
