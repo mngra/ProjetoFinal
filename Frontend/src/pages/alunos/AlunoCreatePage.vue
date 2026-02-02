@@ -1,15 +1,15 @@
 <script setup>
-import { useRouter } from "vue-router";
-import { useAlunosStore } from "@/stores/alunos.store";
-import AlunoForm from "@/components/alunos/AlunoForm.vue";
+  import { useRouter } from "vue-router";
+  import { useAlunosStore } from "@/stores/alunos.store";
+  import AlunoForm from "@/components/alunos/AlunoForm.vue";
 
-const router = useRouter();
-const store = useAlunosStore();
+  const router = useRouter();
+  const store = useAlunosStore();
 
-async function submit(payload) {
-  await store.add(payload);
-  router.push("/alunos");
-}
+  async function submit(payload) {
+    await store.add(payload);
+    router.push("/alunos");
+  }
 </script>
 
 <template>

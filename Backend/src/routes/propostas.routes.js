@@ -24,7 +24,10 @@ async function ensureAlunosExist(alunoIds) {
   return count === alunoIds.length;
 }
 
-// LISTAR propostas (docente: suas | aluno: associadas)
+/* ------------------------------------------------------------------
+ * GET /propostas/
+ * ------------------------------------------------------------------ */
+
 router.get("/", authRequired, async (req, res) => {
   try {
     const defaultLimit = envNumber("PAGINATION_DEFAULT_LIMIT", 10);
@@ -33,21 +36,32 @@ router.get("/", authRequired, async (req, res) => {
     const page = Math.max(parseInt(req.query.page || "1", 10), 1);
     const requestedLimit = parseInt(req.query.limit || String(defaultLimit), 10);
     const limit = Math.min(Math.max(requestedLimit, 1), maxLimit);
-
-    const { titulo = "", autor = "", orientador = "", q = "" } = req.query;
+    const { titulo = "", autor = "", orientador = "", palavras_chave = "", q = "" } = req.query;
 
     const and = [];
 
     if (titulo.trim()) and.push({ titulo: { $regex: titulo.trim(), $options: "i" } });
-    if (autor.trim()) and.push({ "alunos.nome": { $regex: autor.trim(), $options: "i" } });
-    if (orientador.trim()) and.push({ "orientador.nome": { $regex: orientador.trim(), $options: "i" } });
+    if (req.query.palavras_chave?.trim()) {and.push({ palavras_chave: { $in: [new RegExp(req.query.palavras_chave.trim(), "i")] } })};
+    if (orientador.trim()) {
+      const docentes = await Docente.find({
+        nome: { $regex: orientador.trim(), $options: "i" },
+      }).select("_id");
 
+      const ids = docentes.map((d) => d._id);
+      if (ids.length > 0) {
+        and.push({ orientador: { $in: ids } });
+      } else {
+        // Nenhum orientador encontrado → retorna vazio
+        and.push({ orientador: null });
+      }
+    }
     if (q.trim()) {
+      const term = q.trim();
       and.push({
         $or: [
-          { titulo: { $regex: q.trim(), $options: "i" } },
-          { "orientador.nome": { $regex: q.trim(), $options: "i" } },
-          { "alunos.nome": { $regex: q.trim(), $options: "i" } },
+          { titulo: { $regex: term, $options: "i" } },
+          { "orientador.nome": { $regex: term, $options: "i" } },
+          { palavras_chave: { $in: [new RegExp(term, "i")] } },
         ],
       });
     }
@@ -55,10 +69,10 @@ router.get("/", authRequired, async (req, res) => {
     let baseFilter = {};
     if (req.user.type === "docente") {
       baseFilter = {
-    $or: [
+   /* $or: [
       { orientador: req.user.sub },
       { coorientadores: req.user.sub },
-    ],
+    ],*/
   };
     } else if (req.user.type === "aluno") {
       baseFilter = { alunos: req.user.sub };
@@ -88,7 +102,9 @@ router.get("/", authRequired, async (req, res) => {
   }
 });
 
-// OBTER proposta por ID
+/* ------------------------------------------------------------------
+ * GET /propostas/:id
+ * ------------------------------------------------------------------ */
 router.get("/:id", authRequired, async (req, res) => {
   try {
     const { id } = req.params;
@@ -109,8 +125,9 @@ router.get("/:id", authRequired, async (req, res) => {
 });
 
 
-
-// CRIAR proposta (apenas docentes)
+/* ------------------------------------------------------------------
+ * POST /propostas/:id - CRIAR proposta (apenas docentes)
+ * ------------------------------------------------------------------ */
 router.post("/", authRequired, async (req, res) => {
   try {
     if (req.user.type !== "docente") {
@@ -170,7 +187,9 @@ router.post("/", authRequired, async (req, res) => {
   }
 });
 
-// EDITAR proposta
+/* ------------------------------------------------------------------
+ * PUT /propostas/:id - Editar proposta 
+ * ------------------------------------------------------------------ */
 router.put("/:id", authRequired, async (req, res) => {
   try {
     if (req.user.type !== "docente") return res.status(403).json({ message: "Apenas docentes podem editar propostas" });
@@ -215,7 +234,9 @@ router.put("/:id", authRequired, async (req, res) => {
   }
 });
 
-// APAGAR proposta
+/* ------------------------------------------------------------------
+ * DELETE /propostas/:id - APAGAR proposta
+ * ------------------------------------------------------------------ */
 router.delete("/:id", authRequired, async (req, res) => {
   try {
     if (req.user.type !== "docente") return res.status(403).json({ message: "Apenas docentes podem apagar propostas" });

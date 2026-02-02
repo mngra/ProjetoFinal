@@ -16,9 +16,7 @@ export function createHttpClient({
   // 👉 Interceptor de request (token)
   http.interceptors.request.use(
     (config) => {
-      console.log(config);
       const token = getToken?.();
-      console.log(token);
       if (token) {
         config.headers = config.headers ?? {};
         config.headers.Authorization = `Bearer ${token}`; 
@@ -57,7 +55,6 @@ const http = createHttpClient({
   getToken: () => localStorage.getItem("token"),
   onUnauthorized: () => {
     localStorage.removeItem("token");
-   // window.location.href = "/login";
   },
 });
 

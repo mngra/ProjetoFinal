@@ -10,7 +10,6 @@ export async function fetchDocentes({ page = 1, pageSize = 10, filters = {} } = 
       ...filters,
     },
   });
-
   return res.data;
 }
 

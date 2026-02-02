@@ -8,7 +8,9 @@ const { loginLimiter } = require("../middleware/rateLimiters");
 
 const router = express.Router();
 
-// Registo docente (por defeito: só "docente")
+/* ------------------------------------------------------------------
+ * POST Registo docente (por defeito: só "docente")
+ * ------------------------------------------------------------------ */
 router.post("/register/docente", async (req, res) => {
   try {
     const { nome, email, senha } = req.body;
@@ -27,7 +29,7 @@ router.post("/register/docente", async (req, res) => {
       nome,
       email: emailNorm,
       senha_hash,
-      roles: ["docente"], // ✅ sempre
+      roles: ["docente"], 
     });
 
     return res.status(201).json({
@@ -44,7 +46,9 @@ router.post("/register/docente", async (req, res) => {
   }
 });
 
-// Registo aluno (igual)
+/* ------------------------------------------------------------------
+ * POST  Registo aluno (igual)
+ * ------------------------------------------------------------------ */
 router.post("/register/aluno", async (req, res) => {
   try {
     const { nome, email, senha, numero_estudante } = req.body;
@@ -79,7 +83,9 @@ router.post("/register/aluno", async (req, res) => {
   }
 });
 
-// Login (docente/aluno) — docente devolve roles
+/* ------------------------------------------------------------------
+ * POST Login (docente/aluno) — docente devolve roles
+ * ------------------------------------------------------------------ */
 router.post("/login", loginLimiter, async (req, res) => {
   const { email, senha, tipo } = req.body;
 
@@ -92,14 +98,16 @@ router.post("/login", loginLimiter, async (req, res) => {
   try {
     if (tipo === "docente") {
       const docente = await Docente.findOne({ email: emailNorm });
+
       if (!docente) return res.status(401).json({ message: "Credenciais inválidas" });
 
       const ok = await bcrypt.compare(senha, docente.senha_hash);
+      
       if (!ok) return res.status(401).json({ message: "Credenciais inválidas" });
 
       const roles = Array.isArray(docente.roles) && docente.roles.length ? docente.roles : ["docente"];
 
-      // ✅ JWT com roles
+      // JWT com roles
       const token = signToken({
         sub: String(docente._id),
         type: "docente",
@@ -128,7 +136,8 @@ router.post("/login", loginLimiter, async (req, res) => {
     }
 
     return res.status(400).json({ message: "tipo inválido (use 'docente' ou 'aluno')" });
-  } catch {
+  } catch(e) {
+    console.log(e);
     return res.status(500).json({ message: "Erro no login" });
   }
 });

@@ -11,7 +11,7 @@ require("./init/db")(app, () => {
 
   app.listen(port, host, (err) => {
     if (err) throw err;
-    console.log(`API a correr em http://${host}:${port}`);
+      console.log(`API a correr em http://${host}:${port}`);
   });
 });
 module.exports = app;

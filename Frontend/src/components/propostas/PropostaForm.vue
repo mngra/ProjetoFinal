@@ -1,53 +1,52 @@
 <script setup>
-import { ref, computed } from "vue";
+  import { ref, computed } from "vue";
 
-const props = defineProps({
-  proposta: { type: Object, required: true },
-  docentes: { type: Array, default: () => [] },
-  alunos: { type: Array, default: () => [] },
-  loading: { type: Boolean, default: false },
-  submitLabel: { type: String, default: "Guardar" },
-  title: { type: String, default: "Proposta" },
-  readonlyOrientadorNome: { type: String, default: "" },
-});
+  const props = defineProps({
+    proposta: { type: Object, required: true },
+    docentes: { type: Array, default: () => [] },
+    alunos: { type: Array, default: () => [] },
+    loading: { type: Boolean, default: false },
+    submitLabel: { type: String, default: "Guardar" },
+    title: { type: String, default: "Proposta" },
+    readonlyOrientadorNome: { type: String, default: "" },
+  });
 
-const emit = defineEmits(["submit", "cancel"]);
+  const emit = defineEmits(["submit", "cancel"]);
+  const coorientadoresSearch = ref("");
+  const alunosSearch = ref("");
+  const palavraChaveInput = ref("");
 
-const coorientadoresSearch = ref("");
-const alunosSearch = ref("");
-const palavraChaveInput = ref("");
+  // Computed para listas filtradas
+  const docentesFiltrados = computed(() => {
+    const term = coorientadoresSearch.value.toLowerCase();
+    return props.docentes.filter((d) =>
+      (d?.nome || "").toLowerCase().includes(term)
+    );
+  });
 
-// Computed para listas filtradas
-const docentesFiltrados = computed(() => {
-  const term = coorientadoresSearch.value.toLowerCase();
-  return props.docentes.filter((d) =>
-    (d?.nome || "").toLowerCase().includes(term)
-  );
-});
+  const alunosFiltrados = computed(() => {
+    const term = alunosSearch.value.toLowerCase();
+    return props.alunos.filter((a) =>
+      (a?.nome || "").toLowerCase().includes(term)
+    );
+  });
 
-const alunosFiltrados = computed(() => {
-  const term = alunosSearch.value.toLowerCase();
-  return props.alunos.filter((a) =>
-    (a?.nome || "").toLowerCase().includes(term)
-  );
-});
-
-function adicionarPalavraChave() {
-  const p = palavraChaveInput.value.trim();
-  if (p && !props.proposta.palavras_chave.includes(p)) {
-    props.proposta.palavras_chave.push(p);
+  function adicionarPalavraChave() {
+    const p = palavraChaveInput.value.trim();
+    if (p && !props.proposta.palavras_chave.includes(p)) {
+      props.proposta.palavras_chave.push(p);
+    }
+    palavraChaveInput.value = "";
   }
-  palavraChaveInput.value = "";
-}
 
-function removerPalavraChave(i) {
-  props.proposta.palavras_chave.splice(i, 1);
-}
+  function removerPalavraChave(i) {
+    props.proposta.palavras_chave.splice(i, 1);
+  }
 
-function toggleStatus() {
-  props.proposta.status =
-    props.proposta.status === "publica" ? "privada" : "publica";
-}
+  function toggleStatus() {
+    props.proposta.status =
+      props.proposta.status === "publica" ? "privada" : "publica";
+  }
 </script>
 
 <template>

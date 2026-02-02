@@ -1,31 +1,29 @@
 <script setup>
-import { watch, ref } from "vue";
-import { useRouter } from "vue-router";
+  import { watch, ref } from "vue";
+  import { useRouter } from "vue-router";
 
-const router = useRouter();
+  const router = useRouter();
+  const visible = ref(false);
+  const props = defineProps({
+    open: Boolean,
+    message: {
+      type: String,
+      default: "Operação realizada com sucesso",
+    },
+  });
 
-const props = defineProps({
-  open: Boolean,
-  message: {
-    type: String,
-    default: "Operação realizada com sucesso",
-  },
-});
-
-const visible = ref(false);
-
-watch(
-  () => props.open,
-  (v) => {
-    if (v) {
-      visible.value = true;
-      setTimeout(() => {
-        visible.value = false;
-        router.replace("/login");
-      }, 2000);
+  watch(
+    () => props.open,
+    (v) => {
+      if (v) {
+        visible.value = true;
+        setTimeout(() => {
+          visible.value = false;
+          router.replace("/login");
+        }, 2000);
+      }
     }
-  }
-);
+  );
 </script>
 
 <template>

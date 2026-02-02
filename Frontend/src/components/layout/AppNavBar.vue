@@ -6,17 +6,13 @@ import { AcademicCapIcon } from "@heroicons/vue/24/outline";
 
 
 const emit = defineEmits(["toggle-theme"]);
-
 const authStore = useAuthStore();
 const route = useRoute();
 const router = useRouter();
-
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const userName = computed(() => authStore.user?.name || "");
-
 const mobileOpen = ref(false);
 const userMenuOpen = ref(false);
-
 const initials = computed(() => {
   const n = userName.value.trim();
   if (!n) return "U";
@@ -89,36 +85,36 @@ const linkActive = "underline underline-offset-4 decoration-2 font-semibold";
       </RouterLink>
 
       <!-- DESKTOP NAV -->
-<div class="hidden md:flex flex-1 justify-end">
-  <div class="flex items-center gap-6 text-sm font-medium">
+      <div class="hidden md:flex flex-1 justify-end">
+        <div class="flex items-center gap-6 text-sm font-medium">
     
-    <!-- Só para autenticados -->
-    <RouterLink
-      v-if="isAuthenticated"
-      to="/propostas"
-      :class="[linkBase, isActivePrefix('/propostas') && linkActive]"
-    >
-      Propostas
-    </RouterLink>
-<!-- Só Admin -->
-    <RouterLink 
-    v-if="authStore.isAdmin" 
-    to="/alunos" 
-    :class="[linkBase, isActivePrefix('/alunos') && linkActive]">
-      Alunos
-    </RouterLink>
+          <!-- Só para autenticados -->
+          <RouterLink
+            v-if="isAuthenticated"
+            to="/propostas"
+            :class="[linkBase, isActivePrefix('/propostas') && linkActive]"
+          >
+            Propostas
+          </RouterLink>
+
+          <!-- Só Admin -->
+          <RouterLink 
+            v-if="authStore.isAdmin" 
+            to="/alunos" 
+            :class="[linkBase, isActivePrefix('/alunos') && linkActive]">
+            Alunos
+          </RouterLink>
     
-    <!-- Público -->
-    <RouterLink
-      to="/docentes"
-      :class="[linkBase, isActivePrefix('/docentes') && linkActive]"
-    >
-      Docentes
-    </RouterLink>
+          <!-- Público -->
+          <RouterLink
+            to="/docentes"
+            :class="[linkBase, isActivePrefix('/docentes') && linkActive]"
+          >
+            Docentes
+          </RouterLink>
 
-  </div>
-</div>
-
+        </div>
+      </div>
 
       <!-- RIGHT -->
       <div class="flex items-center gap-2">
@@ -136,8 +132,6 @@ const linkActive = "underline underline-offset-4 decoration-2 font-semibold";
             <span class="block h-0.5 bg-white"></span>
           </span>
         </button>
-
-      
 
         <div v-if="isAuthenticated" class="hidden md:block relative" data-user-menu>
           <button
@@ -268,13 +262,6 @@ const linkActive = "underline underline-offset-4 decoration-2 font-semibold";
               </button>
             </div>
           </div>
-
-          <!-- (opcional) theme toggle aqui -->
-          <!--
-          <button class="w-full border rounded-lg px-3 py-2" @click="emit('toggle-theme')">
-            {{ isDark ? "Modo escuro" : "Modo claro" }}
-          </button>
-          -->
         </div>
       </div>
     </div>

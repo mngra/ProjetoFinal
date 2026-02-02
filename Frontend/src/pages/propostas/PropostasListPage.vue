@@ -1,73 +1,72 @@
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
-import { useRouter } from "vue-router";
-import { ArrowPathIcon, EyeIcon, PencilIcon, TrashIcon, PlusIcon } from "@heroicons/vue/24/outline";
-import { usePropostasStore } from "@/stores/propostas.store";
-import { useAuth } from "@/composables/useAuth";
-import ConfirmModal from "@/components/ui/ConfirmModal.vue";
+  import { computed, onMounted, ref, watch } from "vue";
+  import { useRouter } from "vue-router";
+  import { ArrowPathIcon, EyeIcon, PencilIcon, TrashIcon, PlusIcon } from "@heroicons/vue/24/outline";
+  import { usePropostasStore } from "@/stores/propostas.store";
+  import { useAuth } from "@/composables/useAuth";
+  import ConfirmModal from "@/components/ui/ConfirmModal.vue";
 
-const router = useRouter();
-const store = usePropostasStore();
-const { user } = useAuth();
+  const router = useRouter();
+  const store = usePropostasStore();
+  const { user } = useAuth();
 
-/* estado local */
-const propostaParaApagar = ref(null);
-const showDeleteModal = ref(false);
+  /* estado local */
+  const propostaParaApagar = ref(null);
+  const showDeleteModal = ref(false);
 
+  /* computed */
+  const propostas = computed(() => store.items ?? []);
+  const loading = computed(() => store.loading);
+  const error = computed(() => store.error);
+  const page = computed(() => store.page);
+  const total = computed(() => store.total);
+  const totalPages = computed(() => store.totalPages);
+  const canPrev = computed(() => store.canPrev);
+  const canNext = computed(() => store.canNext);
 
-/* computed */
-const propostas = computed(() => store.items ?? []);
-const loading = computed(() => store.loading);
-const error = computed(() => store.error);
+  const filters = store.filters;
 
-const page = computed(() => store.page);
-const total = computed(() => store.total);
-const totalPages = computed(() => store.totalPages);
-const canPrev = computed(() => store.canPrev);
-const canNext = computed(() => store.canNext);
+  const pageSize = computed({
+    get: () => store.pageSize,
+    set: (v) => store.setPageSize(v),
+  });
 
-const filters = store.filters;
+  /* helpers */
+  function verProposta(p) {
+    router.push({ name: "PropostaDetalhe", params: { id: p._id } });
+  }
 
-const pageSize = computed({
-  get: () => store.pageSize,
-  set: (v) => store.setPageSize(v),
-});
+  function isOrientador(p) {
+    return String(p.orientador?._id) === String(user.value?.id);
+  }
 
-/* helpers */
-function verProposta(p) {
-  router.push({ name: "PropostaDetalhe", params: { id: p._id } });
-}
+  function isCoorientador(p) {
+    return p.coorientadores?.some(c => String(c._id) === String(user.value?.id));
+  }
 
-function isOrientador(p) {
-  return String(p.orientador?._id) === String(user.value?.id);
-}
+  /* delete */
+  function pedirConfirmacaoRemocao(p) {
+    propostaParaApagar.value = p;
+    showDeleteModal.value = true;
+  }
 
-function isCoorientador(p) {
-  return p.coorientadores?.some(c => String(c._id) === String(user.value?.id));
-}
+  async function confirmarRemocao() {
+    if (!propostaParaApagar.value) return;
+    await store.remove(propostaParaApagar.value._id);
+    showDeleteModal.value = false;
+    propostaParaApagar.value = null;
+  }
 
-/* delete */
-function pedirConfirmacaoRemocao(p) {
-  propostaParaApagar.value = p;
-  showDeleteModal.value = true;
-}
+  /* watchers */
+  watch(
+    () => ({ ...filters }),
+    () => store.scheduleLoad(),
+    { deep: true }
+  );
 
-async function confirmarRemocao() {
-  if (!propostaParaApagar.value) return;
-  await store.remove(propostaParaApagar.value._id);
-  showDeleteModal.value = false;
-  propostaParaApagar.value = null;
-}
-
-/* watchers */
-watch(
-  () => ({ ...filters }),
-  () => store.scheduleLoad(),
-  { deep: true }
-);
-
-onMounted(store.load);
+  onMounted(store.load);
 </script>
+
 <template>
   <section class="max-w-6xl mx-auto p-6 pt-20">
     <div class="flex items-center justify-end gap-4 mb-4">
@@ -102,16 +101,16 @@ onMounted(store.load);
     <div class="bg-white rounded shadow p-4 mb-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
-        <label class="block text-sm font-medium mb-1">Título</label>
-        <input v-model.trim="filters.titulo" placeholder="Título" class="w-full border rounded px-3 py-2" />
+          <label class="block text-sm font-medium mb-1">Título</label>
+          <input v-model.trim="filters.titulo" placeholder="Título" class="w-full border rounded px-3 py-2" />
         </div>
         <div>
-        <label class="block text-sm font-medium mb-1">Orientador</label>
-        <input v-model.trim="filters.orientador" placeholder="Orientador" class="w-full border rounded px-3 py-2" />
+          <label class="block text-sm font-medium mb-1">Orientador</label>
+          <input v-model.trim="filters.orientador" placeholder="Orientador" class="w-full border rounded px-3 py-2" />
         </div>
         <div>
-        <label class="block text-sm font-medium mb-1">Palavras Chave</label>
-        <input v-model.trim="filters.palavras_chave" placeholder="Palavras Chave" class="w-full border rounded px-3 py-2" />
+          <label class="block text-sm font-medium mb-1">Palavras Chave</label>
+          <input v-model.trim="filters.palavras_chave" placeholder="Palavras Chave" class="w-full border rounded px-3 py-2" />
         </div>
       </div>
     </div>
@@ -160,7 +159,7 @@ onMounted(store.load);
 
     <!-- paginação -->
     <div class="flex justify-between mt-4">
-       <div class="text-sm text-gray-700">
+      <div class="text-sm text-gray-700">
         <span>Total Propostas: {{ total }}</span>
         <span class="ml-3">Página {{ page }} / {{ totalPages }}</span>
       </div>
@@ -172,12 +171,12 @@ onMounted(store.load);
   </section>
 
   <ConfirmModal
-  :open="showDeleteModal"
-  title="Eliminar proposta"
-  :message="`Tem a certeza que pretende eliminar a proposta '${propostaParaApagar?.titulo ?? ''}'?`"
-  confirm-text="Eliminar"
-  cancel-text="Cancelar"
-  @confirm="confirmarRemocao"
-  @cancel="showDeleteModal = false"
-/>
+    :open="showDeleteModal"
+    title="Eliminar proposta"
+    :message="`Tem a certeza que pretende eliminar a proposta '${propostaParaApagar?.titulo ?? ''}'?`"
+    confirm-text="Eliminar"
+    cancel-text="Cancelar"
+    @confirm="confirmarRemocao"
+    @cancel="showDeleteModal = false"
+  />
 </template>

@@ -11,7 +11,6 @@ export default defineConfig(({ mode }) => {
     server: { 
       port: Number(env.VITE_PORT) || 5173,
       proxy: {
-      // tudo o que começa por /api vai para o backend
       "/api": {
         target: "http://localhost:9000",
         changeOrigin: true,

@@ -17,10 +17,6 @@ function getTokenFromStorage() {
 export function getHttp() {
   if (!httpInstance) {
     httpInstance = createHttpClient({
-     /* getToken: () => {
-        const auth = useAuthStore();   // 👈 LIDO AQUI, EM TEMPO REAL
-        return auth.token;
-      },*/
       getToken: getTokenFromStorage,
       onUnauthorized: () => {
         const auth = useAuthStore();

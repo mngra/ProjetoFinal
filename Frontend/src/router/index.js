@@ -8,19 +8,19 @@ const routes = [
     redirect: "/login",
   },
 
-  /* 🔓 PÚBLICO (sem layout) */
+  /*  PÚBLICO (sem layout) */
   {
     path: "/login",
     component: () => import("@/pages/auth/LoginPage.vue"),
     meta: { public: true },
   },
 
-  /* 🌍 MAIN LAYOUT (público e protegido) */
+  /* MAIN LAYOUT (público e protegido) */
   {
     path: "/",
     component: MainLayout,
     children: [
-      /* 🔓 Público com layout */
+      /*  Público com layout */
       {
         path: "docentes",
         component: () => import("@/pages/docentes/DocentesListPage.vue"),
@@ -32,7 +32,7 @@ const routes = [
         meta: { public: true },
       },
 
-      /* 🔐 Protegido com layout */
+      /*  Protegido com layout */
       {
         path: "propostas",
         name: "propostas",
@@ -79,8 +79,6 @@ const routes = [
         component: () => import("@/pages/alunos/AlunoEditPage.vue"),
         meta: { requiresAuth: true, roles: ['admin'] },
       },
-
-      
     ],
   },
 ];

@@ -1,28 +1,28 @@
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { useDocentesStore } from "@/stores/docentes.store";
-import DocenteForm from "@/components/docentes/DocenteForm.vue";
+  import { ref } from "vue";
+  import { useRouter } from "vue-router";
+  import { useDocentesStore } from "@/stores/docentes.store";
+  import DocenteForm from "@/components/docentes/DocenteForm.vue";
 
-const router = useRouter();
-const store = useDocentesStore();
+  const router = useRouter();
+  const store = useDocentesStore();
 
-const error = ref("");
+  const error = ref("");
 
-async function submit(payload) {
-  error.value = "";
+  async function submit(payload) {
+    error.value = "";
 
-  try {
-    await store.add(payload);
-    router.push("/docentes");
-  } catch (e) {
-    error.value = e?.message || "Erro ao criar docente";
+    try {
+      await store.add(payload);
+      router.push("/docentes");
+    } catch (e) {
+      error.value = e?.message || "Erro ao criar docente";
+    }
   }
-}
 
-function goBack() {
-  router.push("/docentes");
-}
+  function goBack() {
+    router.push("/docentes");
+  }
 </script>
 
 <template>

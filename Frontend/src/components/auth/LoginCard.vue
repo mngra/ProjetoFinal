@@ -37,31 +37,6 @@ function submit() {
       <h2 class="text-3xl font-bold text-center mb-6">Autenticação</h2>
 
       <form class="space-y-5" @submit.prevent="submit">
-        <!--<div class="space-y-2">
-        <label class="block text-sm font-medium text-gray-700">
-          Sou:
-        </label>
-
-        <div class="flex gap-4">
-          <label class="flex items-center gap-2">
-            <input
-              type="radio"
-              value="docente"
-              v-model="tipo"
-            />
-            Professor
-          </label>
-
-          <label class="flex items-center gap-2">
-            <input
-              type="radio"
-              value="aluno"
-              v-model="tipo"
-            />
-            Estudante
-          </label>
-        </div>
-      </div> -->
         <div>
           <label class="block font-semibold mb-1">Utilizador</label>
           <input

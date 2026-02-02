@@ -29,13 +29,6 @@ const loginLimiter = createLimiter({
   message: { message: "Demasiadas tentativas de login. Tenta mais tarde." },
 });
 
-// Forgot password
-const forgotPasswordLimiter = createLimiter({
-  windowMs: envNumber("RATE_LIMIT_FORGOT_WINDOW_MIN", 15) * 60 * 1000,
-  max: envNumber("RATE_LIMIT_FORGOT_MAX", 3),
-  message: { message: "Demasiados pedidos de recuperação. Tenta mais tarde." },
-});
-
 // Geral API (opcional)
 const apiLimiter = createLimiter({
   windowMs: envNumber("RATE_LIMIT_API_WINDOW_MIN", 15) * 60 * 1000,
@@ -45,6 +38,5 @@ const apiLimiter = createLimiter({
 
 module.exports = {
   loginLimiter,
-  forgotPasswordLimiter,
   apiLimiter,
 };

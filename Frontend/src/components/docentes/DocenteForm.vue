@@ -8,8 +8,8 @@ const route = useRoute();
 const router = useRouter();
 const store = useDocentesStore();
 const showSuccess = ref(false);
-
 const isEdit = computed(() => !!route.params.id);
+const errors = ref({});
 
 const form = ref({
   nome: "",
@@ -18,8 +18,6 @@ const form = ref({
   password: "",
   confirmPassword: "",
 });
-
-const errors = ref({});
 
 const passwordRegex =
   /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|]).{8,}$/;

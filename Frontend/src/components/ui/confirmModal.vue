@@ -1,25 +1,24 @@
 <script setup>
-defineProps({
-  open: Boolean,
-  title: {
-    type: String,
-    default: "Confirmar ação",
-  },
-  message: {
-    type: String,
-    required: true,
-  },
-  confirmText: {
-    type: String,
-    default: "Confirmar",
-  },
-  cancelText: {
-    type: String,
-    default: "Cancelar",
-  },
-});
-
-const emit = defineEmits(["confirm", "cancel"]);
+  defineProps({
+    open: Boolean,
+    title: {
+      type: String,
+      default: "Confirmar ação",
+    },
+    message: {
+      type: String,
+      required: true,
+    },
+    confirmText: {
+      type: String,
+      default: "Confirmar",
+    },
+    cancelText: {
+      type: String,
+      default: "Cancelar",
+    },
+  });
+  const emit = defineEmits(["confirm", "cancel"]);
 </script>
 
 <template>

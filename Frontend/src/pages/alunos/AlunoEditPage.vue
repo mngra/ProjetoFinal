@@ -1,19 +1,19 @@
 <script setup>
-import { onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { useAlunosStore } from "@/stores/alunos.store";
-import AlunoForm from "@/components/alunos/AlunoForm.vue";
+  import { onMounted } from "vue";
+  import { useRoute, useRouter } from "vue-router";
+  import { useAlunosStore } from "@/stores/alunos.store";
+  import AlunoForm from "@/components/alunos/AlunoForm.vue";
 
-const route = useRoute();
-const router = useRouter();
-const store = useAlunosStore();
+  const route = useRoute();
+  const router = useRouter();
+  const store = useAlunosStore();
 
-onMounted(() => store.fetchOne(route.params.id));
+  onMounted(() => store.fetchOne(route.params.id));
 
-async function submit(payload) {
-  await store.update(route.params.id, payload);
-  router.push("/alunos");
-}
+  async function submit(payload) {
+    await store.update(route.params.id, payload);
+    router.push("/alunos");
+  }
 </script>
 
 <template>

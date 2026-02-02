@@ -1,75 +1,75 @@
 <script setup>
-import { onMounted, computed, watch, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { useAlunosStore } from "@/stores/alunos.store";
-import { useAuth } from "@/composables/useAuth";
-import ConfirmModal from "@/components/ui/ConfirmModal.vue";
-import { ArrowPathIcon, PencilIcon, TrashIcon, PlusIcon } from "@heroicons/vue/24/outline";
+  import { onMounted, computed, watch, ref } from "vue";
+  import { useRoute, useRouter } from "vue-router";
+  import { useAlunosStore } from "@/stores/alunos.store";
+  import { useAuth } from "@/composables/useAuth";
+  import ConfirmModal from "@/components/ui/ConfirmModal.vue";
+  import { ArrowPathIcon, PencilIcon, TrashIcon, PlusIcon } from "@heroicons/vue/24/outline";
 
-const { canManageAlunos } = useAuth();
-const store = useAlunosStore();
-const route = useRoute();
-const router = useRouter();
+  const { canManageAlunos } = useAuth();
+  const store = useAlunosStore();
+  const route = useRoute();
+  const router = useRouter();
 
-const selectedAluno = ref(null);
-const showConfirm = ref(false);
+  const selectedAluno = ref(null);
+  const showConfirm = ref(false);
 
-const alunos = computed(() => store.alunos);
-const loading = computed(() => store.loading);
-const error = computed(() => store.error);
+  const alunos = computed(() => store.alunos);
+  const loading = computed(() => store.loading);
+  const error = computed(() => store.error);
 
-const page = computed(() => store.page);
-const total = computed(() => store.total);
-const totalPages = computed(() => store.totalPages);
+  const page = computed(() => store.page);
+  const total = computed(() => store.total);
+  const totalPages = computed(() => store.totalPages);
 
-const canPrev = computed(() => store.canPrev);
-const canNext = computed(() => store.canNext);
+  const canPrev = computed(() => store.canPrev);
+  const canNext = computed(() => store.canNext);
 
-const filters = store.filters;
-const pageSize = computed({
-  get: () => store.pageSize,
-  set: (v) => store.setPageSize(v),
-});
+  const filters = store.filters;
+  const pageSize = computed({
+    get: () => store.pageSize,
+    set: (v) => store.setPageSize(v),
+  });
 
-const load = () => store.load();
-const next = () => store.next();
-const prev = () => store.prev();
+  const load = () => store.load();
+  const next = () => store.next();
+  const prev = () => store.prev();
 
-onMounted(() => {
-  const q = route.query;
-  store.page = Number(q.page) || 1;
-  store.pageSize = Number(q.pageSize) || store.pageSize;
-  store.filters.nome = q.nome ?? "";
-  store.filters.email = q.email ?? "";
-  store.filters.numero_estudante = q.numero_estudante ?? "";
-  store.load();
-});
+  onMounted(() => {
+    const q = route.query;
+    store.page = Number(q.page) || 1;
+    store.pageSize = Number(q.pageSize) || store.pageSize;
+    store.filters.nome = q.nome ?? "";
+    store.filters.email = q.email ?? "";
+    store.filters.numero_estudante = q.numero_estudante ?? "";
+    store.load();
+  });
 
-watch(
-  () => ({ ...filters }),
-  () => {
-    store.scheduleLoad();
-  },
-  { deep: true }
-);
+  watch(
+    () => ({ ...filters }),
+    () => {
+      store.scheduleLoad();
+    },
+    { deep: true }
+  );
 
-function askDelete(aluno) {
-  selectedAluno.value = aluno;
-  showConfirm.value = true;
-}
+  function askDelete(aluno) {
+    selectedAluno.value = aluno;
+    showConfirm.value = true;
+  }
 
-async function confirmDelete() {
-  if (!selectedAluno.value) return;
-  const id = selectedAluno.value.id ?? selectedAluno.value._id;
-  await store.remove(id);
-  showConfirm.value = false;
-  selectedAluno.value = null;
-}
+  async function confirmDelete() {
+    if (!selectedAluno.value) return;
+    const id = selectedAluno.value.id ?? selectedAluno.value._id;
+    await store.remove(id);
+    showConfirm.value = false;
+    selectedAluno.value = null;
+  }
 
-function cancelDelete() {
-  showConfirm.value = false;
-  selectedAluno.value = null;
-}
+  function cancelDelete() {
+    showConfirm.value = false;
+    selectedAluno.value = null;
+  }
 </script>
 
 <template>

@@ -8,5 +8,4 @@ function envNumber(name, defaultValue) {
   }
   return n;
 }
-
 module.exports = { envNumber };

@@ -1,11 +1,14 @@
 const cors = require("cors");
 const express = require("express");
-const { apiLimiter } = require("../middleware/rateLimiters");
-
 
 module.exports = (app) => {
-  app.use(cors());
+  app.use(cors({ 
+    origin: "http://localhost:10000",
+    credentials: true, 
+    allowedHeaders: ["Content-Type", "Authorization"], 
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+}));
   app.use(express.json());
-  app.use("/api", apiLimiter);
+  
 
 };
